@@ -1,29 +1,19 @@
 import ItemCount from "./ItemCount";
 import ItemList from "./ItemList";
 import {useEffect, useState} from "react";
+import products from "../products.json";
+import {useParams} from "react-router-dom"
 
-const ItemListContainer = (props) => {
+const ItemListContainer = () => {
     const [items, setItems] = useState([]);
-    const {greeting} = props;
-    const products = [
-        {
-            id: '0',
-            title: 'Cordero con piel de lobo Malbec',
-            price: '200',
-            pictureUrl: 'https://www.espaciovino.com.ar/media/default/0001/61/thumb_60952_default_big.jpeg'
-        },
-        {
-            id: '1',
-            title: 'Rutini Cabernet Malbec',
-            price: '1000',
-            pictureUrl: 'https://www.espaciovino.com.ar/media/default/0001/62/thumb_61998_default_big.jpeg'
-        }
-    ];
+    const {categoryId} = useParams();
+
     useEffect(() => {
         const data = new Promise((resolve, reject) => {
-            setTimeout(() => {
-                resolve(products);
-            }, 2000)
+            if (categoryId) {
+                resolve(products.filter(product => product.category === categoryId ))
+            }
+            resolve(products);
         })
 
         data.then((results) => {
@@ -33,13 +23,9 @@ const ItemListContainer = (props) => {
         data.catch((err) => {
             console.log(err)
         })
-    }, [])
+    }, [categoryId])
     return (
         <>
-            <p>{greeting}</p>
-            <ItemCount stock={5} initial={1} onAdd={(contador) => {
-                console.log(`Se agregaron ${contador} unidades`)
-            }}/>
             <ItemList items={items}/>
         </>
     )

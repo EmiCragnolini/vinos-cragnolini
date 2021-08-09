@@ -1,19 +1,20 @@
 import Header from "./components/Header";
-import NavBar from "./components/NavBar";
 import ItemListContainer from "./components/ItemListContainer";
+import {BrowserRouter,Switch,Route} from "react-router-dom"
 import ItemDetailContainer from "./components/ItemDetailContainer";
 
 const App = () => {
-    const greeting = "esto es un saludo";
     return (
-        <>
-            <NavBar/>
+        <BrowserRouter>
+            <Header/>
             <div className="container">
-                <Header/>
-                <ItemListContainer greeting={greeting}/>
-                { /* <ItemDetailContainer/> */ }
+                <Switch>
+                    <Route path="/" exact component={ItemListContainer} />
+                    <Route path="/categoria/:categoryId" component={ItemListContainer} />
+                    <Route path="/item/:itemId" component={ItemDetailContainer} />
+                </Switch>
             </div>
-        </>
+        </BrowserRouter>
     )
 }
 

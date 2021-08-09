@@ -1,29 +1,29 @@
 import {useEffect, useState} from "react";
 import ItemDetail from "./ItemDetail";
+import products from "../products.json";
+import {useParams} from "react-router-dom"
 
 const ItemDetailContainer = () => {
-    const [item, setItem] = useState({})
-    const product = {
-        id: '0',
-        title: 'Cordero con piel de lobo Malbec',
-        description: 'Lorem Ipsum',
-        price: '200',
-        pictureUrl: 'https://www.espaciovino.com.ar/media/default/0001/61/thumb_60952_default_big.jpeg'
-    }
+    const [item, setItem] = useState({});
+    const {itemId} = useParams();
     const getItems = () => {
-        return new Promise((resolve,reject) => {
-            resolve(product)
+        return new Promise((resolve, reject) => {
+            const product = products.filter(product => product.id === itemId)[0];
+            if (product) {
+                resolve(product)
+            }
+            reject("No existe el producto")
         })
     }
     useEffect(() => {
-        setTimeout(() => {
-            return getItems().then((data) => {
-                setItem(data)
-            })
-        }, 2000)
-    },[])
+        return getItems().then((data) => {
+            setItem(data)
+        }).catch((err) => {
+            console.log(err)
+        })
+    }, [itemId])
 
-    return <ItemDetail item={item} />
+    return <ItemDetail item={item}/>
 }
 
 export default ItemDetailContainer
