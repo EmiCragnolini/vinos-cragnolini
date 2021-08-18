@@ -22,16 +22,14 @@ const CustomProvider = ( { children }) => {
     }
 
     const removeItem = (id) => {
-        const index = isInCart(id);
-        const newItems = items.splice(index,1)
-        setItems(newItems)
+        setItems(items.filter(item => item.item.id !== id))
     }
 
     const clear = () => {
         setItems([])
     }
 
-    return ( <Provider value={{addItem}}>
+    return ( <Provider value={{addItem, items, removeItem}}>
         {children}
     </Provider> )
 }
