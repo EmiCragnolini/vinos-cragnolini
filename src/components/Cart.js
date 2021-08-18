@@ -34,6 +34,15 @@ const Cart = () => {
                         </tr>
                     )
                 })}
+                    <tr>
+                        <td colSpan="4"/>
+                        <td>TOTAL</td>
+                        <td colSpan="2">
+                            ${items.reduce((total,{item: {price}, quantity}) => {
+                                return total + (price * quantity)
+                        },0)}
+                        </td>
+                    </tr>
                 </tbody>
             </table>
             }
