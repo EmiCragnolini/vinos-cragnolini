@@ -1,27 +1,29 @@
-import ItemCount from "./ItemCount";
 import ItemList from "./ItemList";
 import {useEffect, useState} from "react";
-import products from "../products.json";
 import {useParams} from "react-router-dom"
+import {firestore} from "../firebase";
 
 const ItemListContainer = () => {
     const [items, setItems] = useState([]);
     const {categoryId} = useParams();
 
     useEffect(() => {
-        const data = new Promise((resolve, reject) => {
-            if (categoryId) {
-                resolve(products.filter(product => product.category === categoryId ))
-            }
-            resolve(products);
-        })
+        const itemCollection = firestore.collection("items");
+        let query;
+        if (categoryId) {
+            query = itemCollection.where("categoryId","==",categoryId).limit(4).get();
+        } else {
+            query = itemCollection.limit(4).get();
+        }
 
-        data.then((results) => {
-            setItems(results);
-        })
-
-        data.catch((err) => {
-            console.log(err)
+        query.then((result) => {
+            const collection = [];
+            result.forEach((document) => {
+                const id = document.id;
+                const data = document.data()
+                collection.push({id,...data});
+            })
+            setItems(collection);
         })
     }, [categoryId])
     return (

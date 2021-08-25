@@ -1,26 +1,19 @@
 import {useEffect, useState} from "react";
 import ItemDetail from "./ItemDetail";
-import products from "../products.json";
 import {useParams} from "react-router-dom"
+import {firestore} from "../firebase";
 
 const ItemDetailContainer = () => {
     const [item, setItem] = useState({});
     const {itemId} = useParams();
-    const getItems = () => {
-        return new Promise((resolve, reject) => {
-            const product = products.filter(product => product.id === itemId)[0];
-            if (product) {
-                resolve(product)
-            }
-            reject("No existe el producto")
-        })
-    }
     useEffect(() => {
-        return getItems().then((data) => {
-            setItem(data)
-        }).catch((err) => {
-            console.log(err)
-        })
+        const itemCollection = firestore.collection("items").doc(itemId).get();
+        itemCollection.then((document) => {
+            const id = document.id;
+            const data = document.data()
+            setItem({id,...data})
+        });
+
     }, [itemId])
 
     return <ItemDetail item={item}/>
