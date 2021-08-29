@@ -7,14 +7,13 @@ const CustomProvider = ( { children }) => {
     const [items, setItems] = useState([])
 
     const addItem = (item, quantity) => {
-        let newItem = {item:item, quantity}
         const index = isInCart(item.id);
         if (index >= 0) {
-            quantity = items[index].quantity + quantity;
-            newItem = {item: items[index].item, quantity }
-            removeItem(item.id)
+            items[index].quantity += quantity;
+            setItems(items)
+        }else {
+            setItems([...items,{item:item, quantity}])
         }
-        setItems([...items, newItem])
     }
 
     const isInCart = (id) => {
@@ -29,7 +28,13 @@ const CustomProvider = ( { children }) => {
         setItems([])
     }
 
-    return ( <Provider value={{addItem, items, removeItem}}>
+    const totalPrice = () => {
+        return items.reduce((total, {item: {price}, quantity}) => {
+            return total + (price * quantity)
+        }, 0)
+    }
+
+    return ( <Provider value={{addItem, items, removeItem, totalPrice, clear}}>
         {children}
     </Provider> )
 }
