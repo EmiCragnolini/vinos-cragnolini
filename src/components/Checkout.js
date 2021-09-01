@@ -13,7 +13,7 @@ const Checkout = () => {
     const [loading, setLoading] = useState(false);
     const history = useHistory();
 
-    const {items, totalPrice, clear} = useContext(CartContext)
+    const {items, totalPrice, clear, removeItem} = useContext(CartContext)
 
     const createOrder = () => {
         setLoading(true)
@@ -37,55 +37,61 @@ const Checkout = () => {
         })
     }
 
-    const updateStockItems = async (e) => {
+    const getOutOfStock = async (i) => {
+        let oos = [];
+        const collection = firestore.collection("items")
+        const docRef = await collection.doc(i.item.id).get();
+        if (docRef.data().stock < i.quantity) {
+            oos.push({...docRef.data(), id: docRef.id});
+        }
+        return oos;
+    }
+
+    const updateStock = (i) => {
+        const docRef = firestore.collection("items").doc(i.item.id);
+        const query = docRef.get();
+        let stockOld;
+        query.then((document) => {
+            const data = document.data();
+            stockOld = data.stock
+            const updateItem = docRef.update({
+                stock: stockOld - i.quantity
+            })
+        })
+    }
+
+    const processOrder = async (e) => {
         e.preventDefault()
 
         setLoading(true);
-        let docRef;
-        const batch = firestore.batch();
 
-        new Promise((res, rej) => {
-            let outOfStock = [];
-            items.forEach((i) => {
-                docRef = firestore.collection("items").doc(i.item.id).get();
-                docRef.then((document) => {
-                    const data = document.data();
-                    if (data.stock < i.quantity) {
-                        outOfStock.push({...data, id: document.id});
-                    }
-                }).catch(() => {
-                    rej("error")
-                })
-            })
-            console.log(outOfStock);
-            if (outOfStock.length === 0 ){
+        new Promise(async (res, rej) => {
+            const outOfStock = items.map(async (i) => {
+                return getOutOfStock(i);
+            }) ;
+            const oos = await Promise.all(outOfStock);
+            if (oos[0].length === 0) {
                 res(true)
+            } else {
+                rej(oos[0])
             }
-            rej(outOfStock);
         }).then((itsOk) => {
             if (itsOk) {
-                items.map((i) => {
-                    docRef = firestore.collection("items").doc(i.item.id);
-                    const query = docRef.get();
-                    let stockOld;
-                    query.then((document) => {
-                        const data = document.data();
-                        stockOld = data.stock
-                        const updateItem = docRef.update({
-                            stock: stockOld - i.quantity
-                        })
-                    })
+                items.forEach((i) => {
+                    updateStock(i);
                 })
                 createOrder();
             }
         }).catch(outOfStock => {
-            console.log(outOfStock)
+            setLoading(false);
             const err = <>
-                <p>Los siguientes productos no hay en stock</p>
+                <p>Los siguientes productos no hay en stock y serán quitado del carrito</p>
                 <ul>
                     {
-                        outOfStock.map(item => {
-                            return <li>{item.title}</li>
+                        outOfStock && outOfStock.map(item => {
+                            const title = item.title;
+                            removeItem(item.id)
+                            return <li>{title}</li>
                         })
                     }
                 </ul>
@@ -111,7 +117,7 @@ const Checkout = () => {
         <div className="row">
             <div className="col-12 col-md-6">
                 <h3>Información de contacto</h3>
-                <form onSubmit={updateStockItems}>
+                <form onSubmit={processOrder}>
                     <div className="mb-3">
                         <label htmlFor="name" className="form-label">Nombre</label>
                         <input type="text" className="form-control" required id="name" placeholder="Horacio"
@@ -141,19 +147,19 @@ const Checkout = () => {
                     </div>
                     }
                 </form>
-                <div className="mb-3">
-                    {error &&
-                    <div className="alert alert-danger" role="alert">
-                        error: {error}
-                    </div>
-                    }
-                </div>
             </div>
             <div className="col-12 col-md-6">
                 {orderId &&
                 <div className="alert alert-success" role="alert">
                     <p>Muchas gracias por su compra, el Id de su pedido es: {orderId}</p>
-                    <p><button onClick={backHome} className="btn text-primary">Seguir navegando</button></p>
+                    <p>
+                        <button onClick={backHome} className="btn text-primary">Seguir navegando</button>
+                    </p>
+                </div>
+                }
+                {error &&
+                <div className="alert alert-danger" role="alert">
+                    error: {error}
                 </div>
                 }
                 {
