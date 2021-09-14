@@ -13,10 +13,10 @@ Se utiliza el servicio gratuito de Firestore para poder alojar los productos del
 ## Proceso de instalación del proyecto
 
 ### Clonar proyecto
-#### `git clone git@github.com:EmiCragnolini/vinos-cragnolini.git`
+`git clone git@github.com:EmiCragnolini/vinos-cragnolini.git`
 ### Instalar dependencias
-### `npm install`
+`npm install`
 ### Iniciar el proyecto
-### `npm start`
+`npm start`
 
 Emiliano Cragnolini
