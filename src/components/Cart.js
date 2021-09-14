@@ -1,9 +1,9 @@
 import {useContext} from "react";
-import {CartContext} from "./context/CartContext";
+import {Context} from "./context/Context";
 import {Link} from "react-router-dom";
 
 const Cart = () => {
-    const {items, removeItem, totalPrice} = useContext(CartContext)
+    const {items, removeItem, totalPrice} = useContext(Context)
 
     return (
         <div className="container">
@@ -40,10 +40,10 @@ const Cart = () => {
                     })}
                     </tbody>
                 </table>
-                <div className="card w-50">
+                <div className="card w-50 float-end">
                     <div className="card-body">
                         <p className="card-text">SubTotal ${totalPrice()} </p>
-                        <Link to="/checkout" className="btn btn-primary">Comprar</Link>
+                        <Link to="/checkout" className="btn btn-success">Comprar</Link>
                     </div>
                 </div>
             </>

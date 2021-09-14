@@ -1,4 +1,4 @@
-import {CartContext} from "./context/CartContext";
+import {Context} from "./context/Context";
 import {useContext, useState} from "react";
 import {Link, Redirect, useHistory} from "react-router-dom";
 import {firestore} from "../firebase";
@@ -13,7 +13,7 @@ const Checkout = () => {
     const [loading, setLoading] = useState(false);
     const history = useHistory();
 
-    const {items, totalPrice, clear, removeItem} = useContext(CartContext)
+    const {items, totalPrice, clear, removeItem} = useContext(Context)
 
     const createOrder = () => {
         setLoading(true)

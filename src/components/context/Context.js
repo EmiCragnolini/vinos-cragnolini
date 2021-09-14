@@ -1,10 +1,15 @@
 import {createContext, useState} from "react";
 
-export const CartContext = createContext();
-const {Provider} = CartContext
+export const Context = createContext();
+const {Provider} = Context
 
 const CustomProvider = ( { children }) => {
     const [items, setItems] = useState([])
+    const [showMenu, setShowMenu] = useState(true)
+
+    const toggleMenu = () => {
+        setShowMenu(!showMenu);
+    }
 
     const addItem = (item, quantity) => {
         const index = isInCart(item.id);
@@ -34,7 +39,7 @@ const CustomProvider = ( { children }) => {
         }, 0)
     }
 
-    return ( <Provider value={{addItem, items, removeItem, totalPrice, clear}}>
+    return ( <Provider value={{addItem, items, removeItem, totalPrice, clear, toggleMenu, showMenu}}>
         {children}
     </Provider> )
 }

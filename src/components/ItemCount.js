@@ -20,12 +20,20 @@ const ItemCount = ({stock, initial, onAdd}) => {
     }
 
     return (
-        <div className="input-group ">
-            <button className="btn btn-outline-secondary" type="button" onClick={decrementar}>-</button>
-            <span className="input-group-text">{contador}</span>
-            <button className="btn btn-outline-secondary" type="button" onClick={incrementar}>+</button>
-            <button className="btn btn-outline-secondary" type="button" onClick={agregar}>Agregar</button>
-        </div>
+        <>
+            <div className="row addToCart my-5">
+                <div className="col-5 col-lg-3">
+                    <div className="input-group ">
+                        <button className="btn" type="button" onClick={decrementar}>-</button>
+                        <span className="input-group-text">{contador}</span>
+                        <button className="btn" type="button" onClick={incrementar}>+</button>
+                    </div>
+                </div>
+                <div className="col">
+                    <button className="btn btn-add" type="button" onClick={agregar}>Agregar al carrito</button>
+                </div>
+            </div>
+        </>
     )
 }
 

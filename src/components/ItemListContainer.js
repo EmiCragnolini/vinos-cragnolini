@@ -1,19 +1,23 @@
 import ItemList from "./ItemList";
-import {useEffect, useState} from "react";
-import {useParams} from "react-router-dom"
+import {useEffect, useState, useContext} from "react";
+import {useLocation} from "react-router-dom"
 import {firestore} from "../firebase";
+import {Context} from "./context/Context";
 
 const ItemListContainer = () => {
     const [items, setItems] = useState([]);
-    const {categoryId} = useParams();
+    const { toggleMenu } = useContext(Context);
+    const category = useLocation();
+    let categoryId;
 
     useEffect(() => {
         const itemCollection = firestore.collection("items");
         let query;
+        const categoryId = category?.state?.categoryId || false;
         if (categoryId) {
-            query = itemCollection.where("categoryId","==",categoryId).limit(4).get();
+            query = itemCollection.where("categoryId","==",categoryId).limit(8).get();
         } else {
-            query = itemCollection.limit(4).get();
+            query = itemCollection.limit(8).get();
         }
 
         query.then((result) => {
@@ -25,10 +29,12 @@ const ItemListContainer = () => {
             })
             setItems(collection);
         })
-    }, [categoryId])
+        toggleMenu();
+    }, [category])
     return (
         <>
-            <ItemList items={items}/>
+            { items.length > 0 && <ItemList items={items}/> }
+            { items.length === 0 && <h3>No hay productos para esta categoría</h3> }
         </>
     )
 }
